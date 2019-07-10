@@ -514,7 +514,7 @@ figure3 <- ggplot(common_graph_data, aes(x = trunc_date)) +
 dumb_model <- lm(Twitter ~ Facebook, data = common_graph_data)
 summary(dumb_model)
 
-lda_model_facebook <- facebook_posts %>%
+log_odds_model_facebook <- facebook_posts %>%
   unnest_tokens(word, Response_Post) %>%
   filter(!word %in% stop_words$word) %>%
   count(word, Institution_Type) %>%
@@ -530,14 +530,14 @@ lda_model_facebook <- facebook_posts %>%
          CARI_BASI_Polytech_ratio = (BASI + CARI + Polytechnic + 1)/(sum(BASI, CARI, Polytechnic, na.rm = TRUE) + 1),
          CCI_IAI_ratio = (CCI + IAI + 1)/(sum(CCI, IAI) + 1))
 
-facebook_cari_cci <- lda_model_facebook %>%
+facebook_cari_cci <- log_odds_model_facebook %>%
   select(word, CARI_ratio, CCI_ratio) %>%
   mutate(log_ratio = log2(CARI_ratio/CCI_ratio)) %>%
   arrange(desc(log_ratio))
 
 facebook_cari_cci <- facebook_cari_cci[c(1:30,63:92),]
 
-facebook_big_vs_small <- lda_model_facebook %>%
+facebook_big_vs_small <- log_odds_model_facebook %>%
   select(word, CARI_BASI_Polytech_ratio, CCI_IAI_ratio) %>%
   mutate(log_ratio = log2(CARI_BASI_Polytech_ratio/CCI_IAI_ratio)) %>%
   arrange(desc(log_ratio))
